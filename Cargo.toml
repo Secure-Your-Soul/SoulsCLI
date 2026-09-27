@@ -1,0 +1,22 @@
+[package]
+name = "souls-cli"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.98.1"
+license = "Apache-2.0"
+authors = ["Denis Kontek <deniskontek@securesouls.com>"]
+keywords = ["soulscli", "secure-your-soul", "cli", "command-line", "developer-tools"]
+categories = ["command-line-utilities"]
+readme = "README.md"
+repository = "https://github.com/Secure-Your-Soul/SoulsCLI"
+homepage = "https://github.com/Secure-Your-Soul/SoulsCLI"
+description = "SoulsCLI for the Secure Your Soul project"
+documentation = "https://docs.rs/souls-cli"
+
+[[bin]]
+name = "s"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.6.7", features = ["derive"] }
+cliclack = "0.5.6"
