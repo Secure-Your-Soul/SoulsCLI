@@ -1,58 +1,78 @@
-#[allow(unused)]
 use cliclack::{
-    select, multiselect, input, password, confirm,
-    intro, outro, log,
-    spinner, progress_bar, multi_progress,
+    select, input, intro, outro, spinner,
+    //log, multiselect, password, confirm, progress_bar, multi_progress
 };
-use crate::{commands, utilities::terminal};
+use crate::{commands::{new, menu}, utilities::{terminal, is_installed, open_browser, capitalize}};
+use std::{ sync::atomic::{AtomicBool, Ordering}};
+static WAS_INTRO: AtomicBool = AtomicBool::new(false);
 pub fn run() {
-    intro("SoulsCLI").unwrap();
+    if !WAS_INTRO.swap(true, Ordering::SeqCst) { intro("Souls").unwrap(); }
+    let mut menu = select("");
+    let is_git = is_installed("git");
+    if is_git { menu = menu.item("new", "New Project", "Create a new project"); }
+    if is_installed("cargo") { menu = menu.item("cargo", "Cargo", "Manage cargo project"); } else { menu = menu.item("nocargo", "Cargo", "Click to install"); }
+    if is_git { menu = menu.item("git", "Git", "Manage git operations"); } else { menu = menu.item("nogit", "Git", "Click to install"); }
 
-    let choice = select("What do you want to do?")
-        .item("new", "New Project", "create a new project")
-        .item("cargo", "Cargo", "manage cargo crates")
-        .item("git", "Git", "git operations")
-        .item("exit", "Exit", "quit the program")
+    let choice = menu
+//      .item("update", "Update", "")
+        .item("exit", "Exit", "Quit the program")
         .interact()
         .unwrap_or_else(|_| std::process::exit(0));
-
-    outro(format!("Selected: {choice}")).unwrap();
-
+    
     match choice.as_ref() {
         "new" => {
-            let name: String = input("Project name?")
+            let name: String = input("Project name")
                 .default_input("souls-project")
                 .placeholder("souls-project")
                 .interact()
                 .unwrap_or_else(|_| std::process::exit(0));
-            commands::new::run(&name);
+            new::run(&name);
         },
-        "cargo" => {
-            let cargo_choice = select("Cargo:")
-            //          Id       Label           Hint
-                .item("check", "Check", "check without building")
-                .item("build", "Build", "compile the project")
-                .item("test", "Test", "run tests")
-                .item("back", "Back", "back to main menu")
-                .interact()
-                .unwrap_or_else(|_| std::process::exit(0));
-
-            match cargo_choice.as_ref() {
-                "check" => terminal("cargo", &["check"]),
-                "build" => terminal("cargo", &["build"]),
-                "test" => terminal("cargo", &["test"]),
-                "back" => commands::menu::run(),
-                _ => unreachable!(),
-            }
-        }
+        "cargo" => cargo_menu(),
+        "nocargo" => open_browser("https://rust-lang.org/tools/install/"),
         "git" => git_menu(),
-        "exit" => std::process::exit(0),
+        "nogit" => open_browser("https://git-scm.com/install/"),
+        "update" => {},
+        "exit" => { outro("").unwrap(); std::process::exit(0); },
         _ => unreachable!(),
     }
 }
 
+fn cargo_menu() {
+    let spinner = spinner();
+    let cargo_choice = select("")
+            .item("check", "Check", "check without building")
+            .item("build", "Build", "compile the project")
+            .item("test", "Test", "run tests")
+            .item("fmt", "Format", "format code with rustfmt")
+            .item("lint", "Lint", "run clippy lints")
+            .item("doc", "Doc", "generate documentation")
+            .item("clean", "Clean", "remove target directory")
+            .item("update", "Update", "update dependencies")
+            .item("back", "Back", "back to main menu")
+            .interact()
+            .unwrap_or_else(|_| std::process::exit(0));
+
+    spinner.start(format!("Cargo: {}", capitalize(cargo_choice)));
+
+    match cargo_choice.as_ref() {
+        "check" => terminal("cargo", &["check", "--workspace"]),
+        "build" => terminal("cargo", &["build", "--workspace"]),
+        "test" => terminal("cargo", &["test", "--workspace"]),
+        "fmt" => terminal("cargo", &["fmt", "--all"]),
+        "lint" => terminal("cargo", &["clippy", "--workspace", "--", "-D", "warnings"]),
+        "doc" => terminal("cargo", &["doc", "--workspace", "--open"]),
+        "clean" => terminal("cargo", &["clean", "--workspace"]),
+        "update" => terminal("cargo", &["update", "--workspace"]),
+        "back" => { spinner.stop("Back"); menu::run(); return; }
+        _ => unreachable!(),
+    }
+    spinner.stop(format!("Cargo: {}", capitalize(cargo_choice)));
+    cargo_menu();
+}
+
 fn git_menu() {
-    let category = select("Git category:")
+    let category = select("")
         .item("work", "Work", "add, amend, commit, restore")
         .item("inspect", "Inspect", "status, diff, log, show")
         .item("history", "History", "branch, merge, rebase, reset, switch, tag")
@@ -66,13 +86,14 @@ fn git_menu() {
         "inspect" => git_inspect(),
         "history" => git_history(),
         "remote" => git_remote(),
-        "back" => run(),  // ← wróć do głównego menu
+        "back" => run(),
         _ => unreachable!(),
     }
 }
 
 fn git_work() {
-    let choice = select("Git work:")
+    let spinner = spinner();
+    let choice = select("")
         .item("add", "Add", "stage all changes")
         .item("amend", "Amend", "change the last commit message")
         .item("commit", "Commit", "commit with default message")
@@ -81,33 +102,39 @@ fn git_work() {
         .interact()
         .unwrap_or_else(|_| std::process::exit(0));
 
+    
+    if choice != "commit" { spinner.start(format!("Git: {}", capitalize(choice))); };
+    
     match choice.as_ref() {
-        "add" => { terminal("git", &["add", "."]); git_work(); }
-        "amend" => { terminal("git", &["commit", "--amend"]); git_work(); }
+        "add" => terminal("git", &["add", "."]),
+        "amend" => terminal("git", &["commit", "--amend"]),
         "commit" => {
-            let title: String = input("Commit title?")
+            let title: String = input("Commit title")
                 .default_input("chore: SoulsCLI default commit")
                 .placeholder("chore: write proper commit message")
                 .interact()
                 .unwrap_or_else(|_| std::process::exit(0));
 
-            let body: String = input("Commit body? (optional)")
+            let body: String = input("Commit body (optional)")
                 .placeholder("Optional description (e.g. - fix bug - add feature)")
                 .interact()
                 .unwrap_or_else(|_| std::process::exit(0));
 
             let msg = if body.is_empty() { title } else { format!("{title}\n\n{body}") };
+            spinner.start(format!("Git: {}", capitalize(choice)));
             terminal("git", &["commit", "-m", &msg]);
-            git_work();
         }
-        "restore" => { terminal("git", &["restore", "."]); git_work(); }
-        "back" => git_menu(),  // ← wróć do Git menu
+        "restore" => terminal("git", &["restore", "."]),
+        "back" => { spinner.stop(format!("Git: {}", capitalize(choice))); git_menu(); return; },
         _ => unreachable!(),
     }
+    spinner.stop(format!("Git: {}", capitalize(choice)));
+    git_work();
 }
 
 fn git_inspect() {
-    let choice = select("Git inspect:")
+    let spinner = spinner();
+    let choice = select("")
         .item("status", "Status", "working tree status")
         .item("diff", "Diff", "show unstaged changes")
         .item("log", "Log", "show last 20 commits")
@@ -116,18 +143,23 @@ fn git_inspect() {
         .interact()
         .unwrap_or_else(|_| std::process::exit(0));
 
+    spinner.start(format!("Git: {}", capitalize(choice)));
+
     match choice.as_ref() {
-        "status" => { terminal("git", &["status"]); git_inspect(); }
-        "diff" => { terminal("git", &["diff"]); git_inspect(); }
-        "log" => { terminal("git", &["log", "--oneline", "-20"]); git_inspect(); }
-        "show" => { terminal("git", &["show"]); git_inspect(); }
-        "back" => git_menu(),  // ← wróć do Git menu
+        "status" => terminal("git", &["status"]),
+        "diff" => terminal("git", &["diff"]),
+        "log" => terminal("git", &["log", "--oneline", "-20"]),
+        "show" => terminal("git", &["show"]),
+        "back" => { spinner.stop(format!("Git: {}", capitalize(choice))); git_menu(); return; },
         _ => unreachable!(),
     }
+    spinner.stop(format!("Git: {}", capitalize(choice)));
+    git_inspect();
 }
 
 fn git_history() {
-    let choice = select("Git history:")
+    let spinner = spinner();
+    let choice = select("")
         .item("branch", "Branch", "list branches")
         .item("tag", "Tag", "list tags")
         .item("reset", "Reset", "reset index")
@@ -138,6 +170,8 @@ fn git_history() {
         .interact()
         .unwrap_or_else(|_| std::process::exit(0));
 
+    if !["switch", "merge", "rebase"].contains(&choice.as_ref()) { spinner.start(format!("Git: {}", capitalize(choice))); }
+
     match choice.as_ref() {
         "branch" => { terminal("git", &["branch"]); git_history(); }
         "tag" => { terminal("git", &["tag"]); git_history(); }
@@ -147,32 +181,38 @@ fn git_history() {
                 .default_input("stable")
                 .interact()
                 .unwrap();
+
+            spinner.start(format!("Git: {}", capitalize(choice)));
             terminal("git", &["switch", &branch]);
-            git_history();
         }
         "merge" => {
             let branch: String = input("Branch to merge?")
                 .default_input("stable")
                 .interact()
                 .unwrap();
+
+            spinner.start(format!("Git: {}", capitalize(choice)));
             terminal("git", &["merge", &branch]);
-            git_history();
         }
         "rebase" => {
             let branch: String = input("Branch to rebase into?")
                 .default_input("stable")
                 .interact()
                 .unwrap();
+
+            spinner.start(format!("Git: {}", capitalize(choice)));
             terminal("git", &["rebase", "-i", "--root", "--autostash", &branch]);
-            git_history();
         }
-        "back" => git_menu(),  // ← wróć do Git menu
+        "back" => { spinner.stop(format!("Git: {}", capitalize(choice))); git_menu(); return; },
         _ => unreachable!(),
     }
+    spinner.stop(format!("Git: {}", capitalize(choice)));
+    git_history();
 }
 
 fn git_remote() {
-    let choice = select("Git remote:")
+    let spinner = spinner();
+    let choice = select("")
         .item("fetch", "Fetch", "download objects and refs")
         .item("pull", "Pull", "pull from remote")
         .item("push", "Push", "push to remote")
@@ -180,11 +220,15 @@ fn git_remote() {
         .interact()
         .unwrap_or_else(|_| std::process::exit(0));
 
+    spinner.start(format!("Git: {}", capitalize(choice)));
+
     match choice.as_ref() {
-        "fetch" => { terminal("git", &["fetch"]); git_remote(); }
-        "pull" => { terminal("git", &["pull"]); git_remote(); }
-        "push" => { terminal("git", &["push"]); git_remote(); }
-        "back" => git_menu(),  // ← wróć do Git menu
+        "fetch" => terminal("git", &["fetch"]),
+        "pull" => terminal("git", &["pull"]),
+        "push" => terminal("git", &["push"]),
+        "back" => { spinner.stop(format!("Git: {}", capitalize(choice))); git_menu(); return; },
         _ => unreachable!(),
     }
+    spinner.stop(format!("Git: {}", capitalize(choice)));
+    git_remote();
 }
