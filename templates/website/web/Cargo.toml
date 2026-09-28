@@ -1,0 +1,11 @@
+[package]
+name = "web"
+version = "0.0.1"
+edition = 2024
+
+[dependencies]
+dioxus = { workspace = true, features = ["web"] }
+ui = { path = "../ui", features = ["web"] }
+
+[features]
+default = []
