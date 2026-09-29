@@ -3,10 +3,13 @@
 ![Issues](https://img.shields.io/github/issues/Secure-Your-Soul/SoulsCLI)
 ![Pull Requests](https://img.shields.io/github/issues-pr/Secure-Your-Soul/SoulsCLI)
 ![Last commit](https://img.shields.io/github/last-commit/Secure-Your-Soul/SoulsCLI)
-
 [![Crates.io](https://img.shields.io/crates/v/souls-cli.svg)](https://crates.io/crates/souls-cli)
 [![Downloads](https://img.shields.io/crates/d/souls-cli.svg)](https://crates.io/crates/souls-cli)
-[![docs.rs](https://img.shields.io/docsrs/souls-cli.svg)](https://docs.rs/souls-cli)
+[![docs.rs](https://img.shields.io/docsrs/crate/souls-cli.svg)](https://docs.rs/crate/souls-cli)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Secure-Your-Soul/SoulsCLI/ci.yml?branch=stable&style=flat-square)](https://github.com/Secure-Your-Soul/SoulsCLI/actions/workflows/ci.yml?query=branch%3Astable)
+[![Coverage Status](https://img.shields.io/coveralls/github/Secure-Your-Soul/SoulsCLI/stable?style=flat-square)](https://coveralls.io/github/Secure-Your-Soul/SoulsCLI?branch=stable)
+[![Contributors](https://img.shields.io/github/contributors/Secure-Your-Soul/SoulsCLI?style=flat-square)](https://github.com/Secure-Your-Soul/SoulsCLI/graphs/contributors)
 
 # SoulsCLI
 > 🦀 Rust CLI for creating and managing Secure Your Soul projects.
