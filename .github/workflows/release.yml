@@ -100,26 +100,33 @@ jobs:
         shell: bash
         run: |
           cd target/${{ matrix.target }}/release
-          tar -czf s-${{ matrix.target }}.tar.gz ${{ matrix.bin }}
+          tar -czf SoulsCLI-${{ matrix.target }}.tar.gz ${{ matrix.bin }}
 
       - name: Package (zip)
         if: matrix.archive == 'zip'
         shell: pwsh
         run: |
           cd target/${{ matrix.target }}/release
-          Compress-Archive -Path ${{ matrix.bin }} -DestinationPath s-${{ matrix.target }}.zip
+          Compress-Archive -Path ${{ matrix.bin }} -DestinationPath SoulsCLI-${{ matrix.target }}.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-            name: s-${{ matrix.target }}
-            path: target/${{ matrix.target }}/release/s-${{ matrix.target }}.${{ matrix.archive }}
+            name: SoulsCLI-${{ matrix.target }}
+            path: target/${{ matrix.target }}/release/SoulsCLI-${{ matrix.target }}.${{ matrix.archive }}
 
   release:
     needs: [tag, build]
     if: needs.tag.outputs.is_new == 'true'
     runs-on: ubuntu-latest
     steps:
+      - name: Generate App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -128,6 +135,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ steps.app-token.outputs.token }}
           tag_name: v${{ needs.tag.outputs.version }}
           files: artifacts/**/*
           generate_release_notes: true

@@ -1,8 +1,27 @@
-name: Coverage
+name: Tests & Coverage
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install souls-cli
+        run: cargo install souls-cli
+
+      #- name: Run CLI(Souls -> Test)
+      #  run: s test
+      
+      - name: Publish on crates test
+        run: cargo publish --dry-run
+
   coverage:
     runs-on: ubuntu-latest
     steps:
