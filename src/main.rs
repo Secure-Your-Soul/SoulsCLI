@@ -1,9 +1,10 @@
 mod commands;
 mod utilities;
-use crate::utilities::{Result, terminal};
+use crate::utilities::terminal;
 use clap::{Parser, Subcommand};
+
 #[derive(Parser)]
-#[command(name = "s", version = "0.0.2")]
+#[command(name = "s", version = "0.0.1")]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -35,42 +36,25 @@ enum Command {
 }
 
 impl Command {
-    fn dispatch(self) -> Result<()> {
+    fn dispatch(self) {
         match self {
-            Self::Publish {
-                crate_name,
-                dry_run,
-            } => {
+            Command::Publish { crate_name, dry_run } => {
                 let mut args = vec!["publish"];
-                if !crate_name.is_empty() {
-                    args.extend(["-p", &crate_name]);
-                }
-                if dry_run {
-                    args.push("--dry-run");
-                }
-                terminal("cargo", &args)?;
+                if !crate_name.is_empty() { args.extend(["-p", &crate_name]); }
+                if dry_run { args.push("--dry-run"); }
+                terminal("cargo", &args);
             }
-            Self::Cargo { args } => run_tool("cargo", &args)?,
-            Self::Git { args } => run_tool("git", &args)?,
-            Self::New { project_name } => commands::new::run(&project_name)?,
-            Self::Menu => commands::menu::run()?,
+            Command::Cargo { args } => run_tool("cargo", &args),
+            Command::Git { args } => run_tool("git", &args),
+            Command::New { project_name } => commands::new::run(&project_name),
+            Command::Menu => commands::menu::run(),
         }
-        Ok(())
     }
 }
 
-fn run_tool(tool: &str, args: &[String]) -> Result<()> {
-    let args: Vec<&str> = args.iter().map(std::string::String::as_str).collect();
-    terminal(tool, &args)
+fn run_tool(tool: &str, args: &[String]) {
+    let args: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    terminal(tool, &args);
 }
 
-fn main() {
-    if let Err(e) = run() {
-        let _ = cliclack::log::error(format!("{e}"));
-        std::process::exit(1);
-    }
-}
-
-fn run() -> Result<()> {
-    Cli::parse().command.dispatch()
-}
+fn main() { Cli::parse().command.dispatch() }
