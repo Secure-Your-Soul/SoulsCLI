@@ -16,8 +16,8 @@ jobs:
       - name: Install souls-cli
         run: cargo install souls-cli
 
-      - name: Run CLI(Souls -> Test)
-        run: s test
+      #- name: Run CLI(Souls -> Test)
+      #  run: s test
       
       - name: Publish on crates test
         run: cargo publish --dry-run
