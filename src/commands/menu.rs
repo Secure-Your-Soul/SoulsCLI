@@ -60,18 +60,16 @@ pub fn run() -> Result<()> {
 fn is_update_available() -> bool {
     let current = env!("CARGO_PKG_VERSION");
 
-    let output = match std::process::Command::new("cargo")
+    let Ok(output) = std::process::Command::new("cargo")
         .args(["search", "souls-cli", "--limit", "1"])
         .output()
-    {
-        Ok(out) => out,
-        Err(_) => return false,
+    else {
+        return false;
     };
 
     let text = String::from_utf8_lossy(&output.stdout);
-    let latest = match text.split('"').nth(1) {
-        Some(v) => v,
-        None => return false,
+    let Some(latest) = text.split('"').nth(1) else {
+        return false;
     };
 
     latest != current
