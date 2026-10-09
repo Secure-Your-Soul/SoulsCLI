@@ -14,42 +14,7 @@ pub fn souls_menu() -> Result<()> {
             .interact()?;
 
         match choice {
-            "test" => {
-                terminal("cargo", &["fmt", "--all"])?;
-
-                terminal(
-                    "cargo",
-                    &[
-                        "clippy",
-                        "--workspace",
-                        "--all-targets",
-                        "--all-features",
-                        "--",
-                        "-D",
-                        "warnings",
-                        "-D",
-                        "clippy::pedantic",
-                        "-D",
-                        "clippy::nursery",
-                        "-D",
-                        "clippy::cargo",
-                        "-W",
-                        "clippy::unwrap_used",
-                        "-W",
-                        "clippy::expect_used",
-                    ],
-                )?;
-                terminal(
-                    "cargo",
-                    &[
-                        "test",
-                        "--workspace",
-                        "--all-features",
-                        "--all-targets",
-                        "--no-fail-fast",
-                    ],
-                )?;
-            }
+            "test" => test()?,
             "run" => souls_run()?,
             "new" => new::run("")?,
             "update" => souls_update()?,
@@ -57,6 +22,43 @@ pub fn souls_menu() -> Result<()> {
             _ => unreachable!(),
         }
     }
+}
+pub fn test() -> Result<()> {
+    terminal("cargo", &["fmt", "--all"])?;
+
+    terminal(
+        "cargo",
+        &[
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--all-features",
+            "--",
+            "-D",
+            "warnings",
+            "-D",
+            "clippy::pedantic",
+            "-D",
+            "clippy::nursery",
+            "-D",
+            "clippy::cargo",
+            "-W",
+            "clippy::unwrap_used",
+            "-W",
+            "clippy::expect_used",
+        ],
+    )?;
+    terminal(
+        "cargo",
+        &[
+            "test",
+            "--workspace",
+            "--all-features",
+            "--all-targets",
+            "--no-fail-fast",
+        ],
+    )?;
+    Ok(())
 }
 pub fn souls_run() -> Result<()> {
     let choice = select("")

@@ -9,35 +9,47 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@a2627de80e5819949c7e1c83ed99b29085fc9bc4 # v1.98.1
+        with:
+          toolchain: "1.98.1"
+          components: rustfmt, clippy
 
-      - name: Install souls-cli
-        run: cargo install souls-cli
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
 
-      #- name: Run CLI(Souls -> Test)
-      #  run: s test
+      - name: Build CLI
+        run: cargo build --release --locked
+
+      - name: Run CLI(Souls -> Test)
+        run: ./target/release/s test
       
       - name: Publish on crates test
-        run: cargo publish --dry-run
+        run: cargo publish --dry-run --locked
 
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@a2627de80e5819949c7e1c83ed99b29085fc9bc4 # v1.98.1
         with:
+          toolchain: "1.98.1"
           components: llvm-tools-preview
-      
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+
       - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@cargo-llvm-cov
-      
+        uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
+        with:
+          tool: cargo-llvm-cov
+          
       - name: Run coverage
-        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
-      
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.info --locked
+
       - name: Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
         with:
           path-to-lcov: ./lcov.info
