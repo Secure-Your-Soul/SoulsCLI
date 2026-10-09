@@ -43,11 +43,11 @@ jobs:
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
-      
-      - name: Run coverage
-        run: cargo llvm-cov --workspace --lcov --output-path lcov.info --locked
         with:
           tool: cargo-llvm-cov
+          
+      - name: Run coverage
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.info --locked
 
       - name: Coveralls
         uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
