@@ -3,7 +3,7 @@ mod utilities;
 use crate::utilities::{Result, terminal};
 use clap::{Parser, Subcommand};
 #[derive(Parser)]
-#[command(name = "SoulsCLI", version)]
+#[command(name = "s", version = "0.0.2")]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -32,8 +32,6 @@ enum Command {
     New { project_name: String },
     #[command(alias = "m")]
     Menu,
-    #[command(alias = "t")]
-    Test,
 }
 
 impl Command {
@@ -56,7 +54,6 @@ impl Command {
             Self::Git { args } => run_tool("git", &args)?,
             Self::New { project_name } => commands::new::run(&project_name)?,
             Self::Menu => commands::menu::run()?,
-            Self::Test => commands::menu::souls::test()?,
         }
         Ok(())
     }
