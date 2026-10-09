@@ -3,7 +3,7 @@ pub mod git;
 pub mod souls;
 use crate::{
     commands::menu::{cargo::cargo_menu, git::git_menu, souls::souls_menu},
-    utilities::{Result, is_installed, open_browser},
+    utilities::{Result, is_installed, open_browser, terminal},
 };
 use cliclack::{
     clear_screen,
@@ -21,6 +21,9 @@ pub fn run() -> Result<()> {
             intro("Souls")?;
         }
         let mut menu = select("");
+        if is_update_available() {
+            menu = menu.item("update", "Update SoulsCLI", "Click to update");
+        }
         let is_cargo = is_installed("cargo");
         let is_git = is_installed("git");
         if is_cargo && is_git {
@@ -40,6 +43,7 @@ pub fn run() -> Result<()> {
         let choice = menu.item("exit", "Exit", "Quit the program").interact()?;
 
         match choice {
+            "update" => terminal("cargo", &["install", "souls-cli", "--force"])?,
             "souls" => souls_menu()?,
             "cargo" => cargo_menu()?,
             "nocargo" => open_browser("https://rust-lang.org/tools/install/")?,
@@ -52,4 +56,23 @@ pub fn run() -> Result<()> {
             _ => unreachable!(),
         }
     }
+}
+fn is_update_available() -> bool {
+    let current = env!("CARGO_PKG_VERSION");
+
+    let output = match std::process::Command::new("cargo")
+        .args(["search", "souls-cli", "--limit", "1"])
+        .output()
+    {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
+
+    let text = String::from_utf8_lossy(&output.stdout);
+    let latest = match text.split('"').nth(1) {
+        Some(v) => v,
+        None => return false,
+    };
+
+    latest != current
 }
