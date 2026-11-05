@@ -1,6 +1,6 @@
 <center>
 
-<img src="https://raw.githubusercontent.com/Secure-Your-Soul/SoulsCLI/stable/assets/logo.jpg" alt="SoulsCLI Logo" width="80" height="80">
+![SoulsCLI Header](https://shieldcn.dev/header/transparent.svg?title=Secure-Your-Soul%2FSoulsCLI&size=square&mode=dark&font=geist&subtitle=Rust+CLI+for+creating+and+managing+Secure+Your+Soul+projects.&mode=dark&image=https%3A%2F%2Fraw.githubusercontent.com%2FSecure-Your-Soul%2FSoulsCLI%2Fstable%2Fassets%2Flogo.jpg&overlay=0.6)
 
 [![GitHub Stars](https://www.shieldcn.dev/github/stars/Secure-Your-Soul/SoulsCLI?variant=ghost&size=sm&mode=dark&font=geist-mono)](https://github.com/Secure-Your-Soul/SoulsCLI/stargazers)
 [![GitHub Forks](https://www.shieldcn.dev/github/forks/Secure-Your-Soul/SoulsCLI?variant=ghost&size=sm&mode=dark&font=geist-mono)](https://github.com/Secure-Your-Soul/SoulsCLI/forks)
