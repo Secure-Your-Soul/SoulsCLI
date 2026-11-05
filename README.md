@@ -1,4 +1,4 @@
-<center>
+<div align="center">
 
 ![SoulsCLI Header](https://shieldcn.dev/header/transparent.svg?title=Secure-Your-Soul%2FSoulsCLI&size=square&mode=dark&font=geist&subtitle=Rust+CLI+for+creating+and+managing+Secure+Your+Soul+projects.&mode=dark&image=https%3A%2F%2Fraw.githubusercontent.com%2FSecure-Your-Soul%2FSoulsCLI%2Fstable%2Fassets%2Flogo.jpg&overlay=0.6)
 
@@ -22,7 +22,7 @@
 [![Coverage](https://shieldcn.dev/coveralls/github/Secure-Your-Soul/SoulsCLI?variant=ghost&size=sm&mode=dark&font=geist-mono)](https://coveralls.io/github/Secure-Your-Soul/SoulsCLI?branch=stable)
 [![License](https://www.shieldcn.dev/github/license/Secure-Your-Soul/SoulsCLI?variant=ghost&size=sm&mode=dark&font=geist-mono)](https://github.com/Secure-Your-Soul/SoulsCLI/blob/stable/LICENSE)
 
-</center>
+</div>
 
 ## Table of Contents
 - [Requirements](#-requirements)
