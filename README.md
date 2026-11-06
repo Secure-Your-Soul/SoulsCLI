@@ -35,8 +35,7 @@
 
 ## 📋 Requirements
 
-- 🦀 **Rust 1.98.1**
-- 🦀 **Cargo 1.98.1**
+- 🦀 **Rustc 1.98.1**
 - **Git 2.55.0**
 
 ## 📦 Installation
