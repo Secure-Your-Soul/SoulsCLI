@@ -24,14 +24,19 @@
 
 </div>
 
-## Table of Contents
-- [Requirements](#-requirements)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Documentation](#-documentation)
-- [Contributing](#-contributing)
-- [Security](#-security)
-- [License](#-license)
+<h2 align="center">📖 Table of Contents</h2>
+
+<p align="center">
+  <big>
+    <a href="#-requirements">Requirements</a> •
+    <a href="#-installation">Installation</a> •
+    <a href="#-usage">Usage</a> •
+    <a href="#-documentation">Documentation</a> •
+    <a href="#-contributing">Contributing</a> •
+    <a href="#-security">Security</a> •
+    <a href="#-license">License</a>
+  </big>
+</p>
 
 ## 📋 Requirements
 
